@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mr. O's Arcade</title>
+<meta name="description" content="Review games for IB Computer Science and IB Math Applications & Interpretation, made by Mr. Ostroman.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12101f;
+    --bg-2: #1b1830;
+    --card: #221e3b;
+    --card-hover: #2a2549;
+    --line: #3a3460;
+    --text: #f1eefc;
+    --muted: #a9a3c9;
+    --cs: #3fd8e8;
+    --math: #ff8f5c;
+    --fun: #f4c84a;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% -10%, rgba(63,216,232,.14), transparent 45%),
+      radial-gradient(circle at 95% 10%, rgba(255,143,92,.12), transparent 40%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 56px 0 28px; text-align: center; }
+  .marquee {
+    display: inline-block;
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(22px, 5.5vw, 44px);
+    line-height: 1.35;
+    letter-spacing: 1px;
+    padding: 18px 24px;
+    border: 3px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-2);
+    box-shadow: 0 0 0 6px var(--bg), 0 0 0 9px var(--line);
+  }
+  .marquee .o { color: var(--fun); }
+  .tagline { color: var(--muted); font-size: 18px; margin: 26px auto 0; max-width: 560px; }
+
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin: 30px 0 8px;
+  }
+  .filters button {
+    font: inherit; font-weight: 700; font-size: 15px;
+    color: var(--text); background: var(--bg-2);
+    border: 2px solid var(--line); border-radius: 999px;
+    padding: 9px 18px; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .filters button:hover { border-color: var(--muted); }
+  .filters button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .filters .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+
+  section { margin-top: 44px; }
+  section[hidden] { display: none; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .section-head h2 {
+    font-family: "Press Start 2P", monospace; font-size: 16px; line-height: 1.6;
+    margin: 0; letter-spacing: .5px;
+  }
+  .section-head p { margin: 0; color: var(--muted); font-size: 15px; }
+  #cs .section-head h2 { color: var(--cs); }
+  #math .section-head h2 { color: var(--math); }
+  #fun .section-head h2 { color: var(--fun); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 18px; }
+
+  .card {
+    --accent: var(--cs);
+    display: flex; flex-direction: column;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .card.math { --accent: var(--math); }
+  .card.fun { --accent: var(--fun); }
+  .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: var(--accent); background: var(--card-hover); outline: none; }
+
+  .art {
+    height: 132px; display: grid; place-items: center;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent),
+      repeating-linear-gradient(90deg, transparent 0 23px, rgba(255,255,255,.035) 23px 24px),
+      repeating-linear-gradient(0deg, transparent 0 23px, rgba(255,255,255,.035) 23px 24px);
+    border-bottom: 2px solid var(--line);
+  }
+  .art svg { width: 84px; height: 84px; }
+
+  .body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+  .topic {
+    font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 6px;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 22px; line-height: 1.2; }
+  .card p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; margin-bottom: 16px; }
+  .tags span {
+    font-size: 12.5px; font-weight: 500;
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--bg-2); border: 1px solid var(--line); color: var(--text);
+  }
+  .play {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: "Press Start 2P", monospace; font-size: 12px;
+    padding: 14px; border-radius: 12px;
+    background: var(--accent); color: #15121f;
+  }
+
+  .tips {
+    margin-top: 56px; padding: 24px; border-radius: var(--radius);
+    background: var(--bg-2); border: 2px dashed var(--line);
+  }
+  .tips h2 { font-family: "Press Start 2P", monospace; font-size: 14px; margin: 0 0 14px; line-height: 1.6; }
+  .tips ul { margin: 0; padding-left: 20px; color: var(--muted); }
+  .tips li { margin: 6px 0; }
+  .tips code { background: var(--card); color: var(--text); padding: 1px 6px; border-radius: 6px; font-size: 14px; }
+
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+    .card:hover, .card:focus-visible { transform: none; }
+  }
+  @media (max-width: 420px) {
+    header { padding-top: 36px; }
+    .marquee { padding: 14px 16px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="marquee">MR. <span class="o">O</span>'S<br>ARCADE</div>
+    <p class="tagline">Review games for IB Computer Science and IB Math Applications &amp; Interpretation. Pick a game, grab your team, and try not to lose to the villain.</p>
+
+    <nav class="filters" aria-label="Filter games">
+      <button type="button" data-filter="all" aria-pressed="true">All games</button>
+      <button type="button" data-filter="cs" aria-pressed="false"><span class="dot" style="background:var(--cs)"></span>IB Computer Science</button>
+      <button type="button" data-filter="math" aria-pressed="false"><span class="dot" style="background:var(--math)"></span>IB Math AI</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ IB COMPUTER SCIENCE ============ -->
+    <section id="cs" data-group="cs">
+      <div class="section-head">
+        <h2>IB COMPUTER SCIENCE</h2>
+        <p>2027 syllabus</p>
+      </div>
+      <div class="grid">
+
+        <a class="card cs" href="https://ostromaj.github.io/gate-crash/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#3fd8e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M16 14h16a18 18 0 0 1 0 36H16z"/>
+              <path d="M4 24h12M4 40h12M50 32h10"/>
+              <text x="23" y="37" fill="#3fd8e8" stroke="none" font-size="13" font-family="monospace" font-weight="700">&amp;</text>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">A1 · Binary, hex &amp; logic gates</div>
+            <h3>Gate Crash</h3>
+            <p>Overcooked-style chaos in a logic foundry. Run bits through NOT, AND and OR machines and fill orders before Bitflip the gremlin jams everything.</p>
+            <div class="tags"><span>Co-op · up to 4</span><span>Null King Saga #1</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+        <a class="card cs" href="https://ostromaj.github.io/packet-thief/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#3fd8e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="6" y="20" width="52" height="24" rx="4"/>
+              <path d="M18 20v24M46 20v24"/>
+              <path d="M26 32h12"/>
+              <path d="M32 6l3 7-3 3-3-3z" fill="#3fd8e8"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">A2 · Networks</div>
+            <h3>Packet Thief</h3>
+            <p>A 3D wizard adventure. Cast wall runes to uncover headers, payloads and trailers, rebuild packets at the routers, and chase Lord Lag across copper, fibre and wireless.</p>
+            <div class="tags"><span>3D</span><span>Co-op · up to 4</span><span>3 acts</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+        <a class="card cs" href="https://ostromaj.github.io/Databasegame/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#3fd8e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <ellipse cx="32" cy="14" rx="20" ry="7"/>
+              <path d="M12 14v36c0 4 9 7 20 7s20-3 20-7V14"/>
+              <path d="M12 26c0 4 9 7 20 7s20-3 20-7M12 38c0 4 9 7 20 7s20-3 20-7"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">A3 · Databases</div>
+            <h3>Who Wants to Be Rich? Database Edition</h3>
+            <p>Climb the money ladder from $100 to $1,000,000 by nailing 1NF, 2NF and 3NF. Lifelines included: 50:50, Ask the Class and Phone a DBA.</p>
+            <div class="tags"><span>Solo or whole class</span><span>Normalization</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+        <a class="card cs" href="https://ostromaj.github.io/ib-byte-escape/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#3fd8e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="14" y="6" width="36" height="52" rx="3"/>
+              <circle cx="42" cy="34" r="2.5" fill="#3fd8e8"/>
+              <path d="M22 18h4v10h-4zM30 18h4"/>
+              <path d="M30 24h4v4h-4z"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">Whole course review</div>
+            <h3>IB Byte Escape</h3>
+            <p>A multiplayer 3D escape room that spans the course. Every door tests a different topic, and some keep their topic hidden until you look out the window.</p>
+            <div class="tags"><span>3D</span><span>Multiplayer</span><span>Exam review</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ============ IB MATH AI ============ -->
+    <section id="math" data-group="math">
+      <div class="section-head">
+        <h2>IB MATH AI</h2>
+        <p>Applications &amp; Interpretation SL</p>
+      </div>
+      <div class="grid">
+
+        <a class="card math" href="https://ostromaj.github.io/inverse-haunt/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#ff8f5c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M14 56V28a18 18 0 0 1 36 0v28l-6-5-6 5-6-5-6 5-6-5z"/>
+              <circle cx="25" cy="28" r="3" fill="#ff8f5c"/>
+              <circle cx="39" cy="28" r="3" fill="#ff8f5c"/>
+              <path d="M27 40c3 2 7 2 10 0"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">Functions · Inverses</div>
+            <h3>Inverse Haunt</h3>
+            <p>A first-person haunted-house maze. Creep through the dark with a flashlight, grab the keys, and when a ghost catches you, solve its inverse-function problem to destroy it.</p>
+            <div class="tags"><span>First-person</span><span>Spooky</span><span>~30 min</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ============ JUST FOR FUN ============ -->
+    <section id="fun" data-group="fun">
+      <div class="section-head">
+        <h2>JUST FOR FUN</h2>
+        <p>Brain break approved</p>
+      </div>
+      <div class="grid">
+
+        <a class="card fun" href="https://ostromaj.github.io/biscuitmaker/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#f4c84a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <ellipse cx="32" cy="40" rx="22" ry="10"/>
+              <path d="M10 40V30c0-6 10-10 22-10s22 4 22 10v10"/>
+              <path d="M10 30c0 6 10 10 22 10s22-4 22-10"/>
+              <path d="M26 10c0 3 3 3 3 6M36 8c0 3 3 3 3 6"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">Baking challenge</div>
+            <h3>Biscuit Bake-Off</h3>
+            <p>Six stations, one shot at the perfect buttermilk biscuit. Try today's class challenge so everyone gets the same kitchen and can compare scores.</p>
+            <div class="tags"><span>Solo</span><span>Daily class challenge</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <aside class="tips">
+      <h2>PLAYING WITH YOUR CLASS</h2>
+      <ul>
+        <li><strong>Gate Crash:</strong> one person presses <em>Host a game</em> and reads out the 4-letter room code. Everyone else types it in and presses <em>Join</em>.</li>
+        <li><strong>Packet Thief:</strong> type the same party code on the title screen to team up (up to 4). Add <code>?class=yourclass</code> to the link for a class leaderboard.</li>
+        <li>Your scores and personal bests are saved in your own browser, so use the same computer if you want to beat them.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer>Made by Mr. Ostroman · More games on the way</footer>
+</div>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.filters button');
+    var sections = document.querySelectorAll('section[data-group]');
+    function apply(filter) {
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.filter === filter)); });
+      sections.forEach(function (s) {
+        var g = s.dataset.group;
+        s.hidden = !(filter === 'all' || g === filter);
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        apply(b.dataset.filter);
+        try { history.replaceState(null, '', b.dataset.filter === 'all' ? location.pathname : '#' + b.dataset.filter); } catch (e) {}
+      });
+    });
+    var start = (location.hash || '').replace('#', '');
+    if (start === 'cs' || start === 'math') apply(start);
+  })();
+</script>
+</body>
+</html>
