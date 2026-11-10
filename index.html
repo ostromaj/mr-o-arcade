@@ -20,6 +20,7 @@
     --cs: #3fd8e8;
     --math: #ff8f5c;
     --fun: #f4c84a;
+    --func: #5fd68a;
     --radius: 18px;
   }
   * { box-sizing: border-box; }
@@ -79,6 +80,7 @@
   .section-head p { margin: 0; color: var(--muted); font-size: 15px; }
   #cs .section-head h2 { color: var(--cs); }
   #math .section-head h2 { color: var(--math); }
+  #func .section-head h2 { color: var(--func); }
   #fun .section-head h2 { color: var(--fun); }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 18px; }
@@ -94,6 +96,7 @@
     transition: transform .18s ease, border-color .18s ease, background .18s ease;
   }
   .card.math { --accent: var(--math); }
+  .card.func { --accent: var(--func); }
   .card.fun { --accent: var(--fun); }
   .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: var(--accent); background: var(--card-hover); outline: none; }
 
@@ -154,12 +157,13 @@
 
   <header>
     <div class="marquee">MR. <span class="o">O</span>'S<br>ARCADE</div>
-    <p class="tagline">Review games for IB Computer Science and IB Math Applications &amp; Interpretation. Pick a game, grab your team, and try not to lose to the villain.</p>
+    <p class="tagline">Review games for IB Computer Science, IB Math Applications &amp; Interpretation, and functional math. Pick a game, grab your team, and try not to lose to the villain.</p>
 
     <nav class="filters" aria-label="Filter games">
       <button type="button" data-filter="all" aria-pressed="true">All games</button>
       <button type="button" data-filter="cs" aria-pressed="false"><span class="dot" style="background:var(--cs)"></span>IB Computer Science</button>
       <button type="button" data-filter="math" aria-pressed="false"><span class="dot" style="background:var(--math)"></span>IB Math AI</button>
+      <button type="button" data-filter="func" aria-pressed="false"><span class="dot" style="background:var(--func)"></span>Functional Math</button>
     </nav>
   </header>
 
@@ -386,6 +390,54 @@
       </div>
     </section>
 
+    <!-- ============ FUNCTIONAL MATH ============ -->
+    <section id="func" data-group="func">
+      <div class="section-head">
+        <h2>FUNCTIONAL MATH</h2>
+        <p>Money and banking for real life</p>
+      </div>
+      <div class="grid">
+
+        <a class="card func" href="https://ostromaj.github.io/check-game/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#5fd68a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="4" y="16" width="56" height="32" rx="3"/>
+              <path d="M10 26h18M10 40h22M38 40h16"/>
+              <rect x="40" y="22" width="14" height="9" rx="1.5"/>
+              <path d="M24 8l4 4 4-4M28 12v-8" />
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">Life skills · Paychecks</div>
+            <h3>Check Game</h3>
+            <p>Open an account at Beachview Bank and deposit your paycheck. Snap a picture of a practice check with the camera, fill out a deposit slip at the teller, and figure out your new balance.</p>
+            <div class="tags"><span>Solo</span><span>Uses the camera</span><span>English · Español</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+        <a class="card func" href="https://ostromaj.github.io/atm-practice/">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#5fd68a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="10" y="6" width="44" height="52" rx="5"/>
+              <rect x="16" y="12" width="32" height="16" rx="2"/>
+              <circle cx="21" cy="36" r="1.8" fill="#5fd68a"/><circle cx="29" cy="36" r="1.8" fill="#5fd68a"/><circle cx="37" cy="36" r="1.8" fill="#5fd68a"/>
+              <circle cx="21" cy="43" r="1.8" fill="#5fd68a"/><circle cx="29" cy="43" r="1.8" fill="#5fd68a"/><circle cx="37" cy="43" r="1.8" fill="#5fd68a"/>
+              <path d="M44 34v12M16 51h32"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="topic">Life skills · Banking</div>
+            <h3>ATM Practice with Shelly</h3>
+            <p>Shelly the turtle teaches you the ATM step by step. Put your card in, cover your PIN, get cash, make deposits, then take on real-life missions.</p>
+            <div class="tags"><span>Solo</span><span>Touchscreen</span><span>Read aloud</span></div>
+            <div class="play">PLAY ▸</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
     <!-- ============ JUST FOR FUN ============ -->
     <section id="fun" data-group="fun">
       <div class="section-head">
@@ -430,25 +482,6 @@
           </div>
         </a>
 
-        <a class="card fun" href="https://ostromaj.github.io/atm-practice/">
-          <div class="art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none" stroke="#f4c84a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-              <rect x="10" y="6" width="44" height="52" rx="5"/>
-              <rect x="16" y="12" width="32" height="16" rx="2"/>
-              <circle cx="21" cy="36" r="1.8" fill="#f4c84a"/><circle cx="29" cy="36" r="1.8" fill="#f4c84a"/><circle cx="37" cy="36" r="1.8" fill="#f4c84a"/>
-              <circle cx="21" cy="43" r="1.8" fill="#f4c84a"/><circle cx="29" cy="43" r="1.8" fill="#f4c84a"/><circle cx="37" cy="43" r="1.8" fill="#f4c84a"/>
-              <path d="M44 34v12M16 51h32"/>
-            </svg>
-          </div>
-          <div class="body">
-            <div class="topic">Life skills · Banking</div>
-            <h3>ATM Practice with Shelly</h3>
-            <p>Shelly the turtle teaches you the ATM step by step. Put your card in, cover your PIN, get cash, make deposits, then take on real-life missions.</p>
-            <div class="tags"><span>Solo</span><span>Touchscreen</span><span>Read aloud</span></div>
-            <div class="play">PLAY ▸</div>
-          </div>
-        </a>
-
       </div>
     </section>
 
@@ -483,7 +516,7 @@
       });
     });
     var start = (location.hash || '').replace('#', '');
-    if (start === 'cs' || start === 'math') apply(start);
+    if (start === 'cs' || start === 'math' || start === 'func') apply(start);
   })();
 </script>
 </body>
