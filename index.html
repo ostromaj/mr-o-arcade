@@ -21,6 +21,7 @@
     --math: #ff8f5c;
     --fun: #f4c84a;
     --func: #5fd68a;
+    --live: #ff6b7d;
     --radius: 18px;
   }
   * { box-sizing: border-box; }
@@ -82,6 +83,7 @@
   #math .section-head h2 { color: var(--math); }
   #func .section-head h2 { color: var(--func); }
   #fun .section-head h2 { color: var(--fun); }
+  #live .section-head h2 { color: var(--live); }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 18px; }
 
@@ -98,6 +100,21 @@
   .card.math { --accent: var(--math); }
   .card.func { --accent: var(--func); }
   .card.fun { --accent: var(--fun); }
+  .card.live { --accent: var(--live); }
+  .card.static:hover { transform: none; border-color: var(--line); background: var(--card); }
+  .cardWrap { display: flex; flex-direction: column; gap: 10px; }
+  .cardWrap .card { flex: 1; }
+  .cardLinks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cardLinks a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    padding: 12px 8px; border-radius: 12px; text-decoration: none; text-align: center;
+    font-family: "Press Start 2P", monospace; font-size: 11px; line-height: 1.4;
+    border: 2px solid var(--live); transition: transform .15s, background .15s;
+  }
+  .cardLinks a small { font-family: "Space Grotesk", system-ui, sans-serif; font-size: 12px; font-weight: 500; opacity: .85; }
+  .cardLinks a.student { background: var(--live); color: #15121f; }
+  .cardLinks a.teacher { background: var(--bg-2); color: var(--text); }
+  .cardLinks a:hover, .cardLinks a:focus-visible { transform: translateY(-2px); outline: none; }
   .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: var(--accent); background: var(--card-hover); outline: none; }
 
   .art {
@@ -164,10 +181,45 @@
       <button type="button" data-filter="cs" aria-pressed="false"><span class="dot" style="background:var(--cs)"></span>IB Computer Science</button>
       <button type="button" data-filter="math" aria-pressed="false"><span class="dot" style="background:var(--math)"></span>IB Math AI</button>
       <button type="button" data-filter="func" aria-pressed="false"><span class="dot" style="background:var(--func)"></span>Functional Math</button>
+      <button type="button" data-filter="live" aria-pressed="false"><span class="dot" style="background:var(--live)"></span>Whole class</button>
     </nav>
   </header>
 
   <main>
+    <!-- ============ WHOLE CLASS ============ -->
+    <section id="live" data-group="live">
+      <div class="section-head">
+        <h2>WHOLE CLASS</h2>
+        <p>Teacher runs it on the board, everyone joins</p>
+      </div>
+      <div class="grid">
+
+        <div class="cardWrap">
+          <div class="card live static">
+            <div class="art" aria-hidden="true">
+              <svg viewBox="0 0 64 64" fill="none" stroke="#ff6b7d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M4 34c8-3 16-3 24 0s16 3 24 0 8-2 8-2"/>
+                <circle cx="32" cy="34" r="5" fill="#ff6b7d"/>
+                <path d="M12 24v20M52 24v20" opacity=".55"/>
+                <path d="M8 18l4 4 4-4M48 18l4 4 4-4" opacity=".55"/>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="topic">Live team battle · Math AI + CS</div>
+              <h3>Team Tug</h3>
+              <p>A whole-class tug-of-war on the projector. Every right answer pulls the rope for your team, streaks pull harder, and quick mini-games between rounds win bonus pulls.</p>
+              <div class="tags"><span>2–4 teams</span><span>Chromebook or phone</span><span>Math AI &amp; CS question banks</span></div>
+            </div>
+          </div>
+          <div class="cardLinks">
+            <a class="student" href="https://ostromaj.github.io/team-tug/">JOIN ▸<small>Students</small></a>
+            <a class="teacher" href="https://ostromaj.github.io/team-tug/host.html">HOST ▸<small>Teacher screen</small></a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ============ IB COMPUTER SCIENCE ============ -->
     <section id="cs" data-group="cs">
       <div class="section-head">
@@ -508,6 +560,7 @@
       <ul>
         <li><strong>Gate Crash:</strong> one person presses <em>Host a game</em> and reads out the 4-letter room code. Everyone else types it in and presses <em>Join</em>.</li>
         <li><strong>Packet Thief:</strong> type the same party code on the title screen to team up (up to 4). Add <code>?class=yourclass</code> to the link for a class leaderboard.</li>
+        <li><strong>Team Tug:</strong> your teacher opens the host screen on the board. Press <em>Join</em> on the Team Tug card, type the 4-letter code and your first name.</li>
         <li>Your scores and personal bests are saved in your own browser, so use the same computer if you want to beat them.</li>
       </ul>
     </aside>
@@ -534,7 +587,7 @@
       });
     });
     var start = (location.hash || '').replace('#', '');
-    if (start === 'cs' || start === 'math' || start === 'func') apply(start);
+    if (start === 'cs' || start === 'math' || start === 'func' || start === 'live') apply(start);
   })();
 </script>
 </body>
