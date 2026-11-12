@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Leaderboard Admin</title>
+<style>
+  :root { color-scheme: dark; --bg: #13111f; --panel: #1b1830; --card: #221e3b; --line: #3a3460; --text: #f1eefc; --muted: #a9a3c9; --accent: #f4c84a; --bad: #ff6b7d; --good: #5fd68a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 22px 16px 60px; }
+  h1 { font-size: 24px; margin: 0 0 4px; } h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .panel { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .spacer { flex: 1; }
+  button { font: 700 14px system-ui, sans-serif; border-radius: 10px; padding: 9px 14px; cursor: pointer; border: 2px solid var(--line); background: var(--card); color: var(--text); }
+  button:hover { border-color: var(--muted); }
+  button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--card)); }
+  button.primary { background: var(--accent); color: #15121f; border-color: var(--accent); }
+  button.danger { background: transparent; color: var(--bad); border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); }
+  button.danger:hover { background: color-mix(in srgb, var(--bad) 14%, transparent); }
+  button:disabled { opacity: .45; cursor: default; }
+  select { font: 600 14px system-ui, sans-serif; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--card); color: var(--text); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  td.num { font-weight: 800; font-variant-numeric: tabular-nums; }
+  td.when { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+  #msg { min-height: 1.4em; margin: 10px 0 0; color: var(--muted); }
+  #msg.err { color: var(--bad); } #msg.ok { color: var(--good); }
+  .empty { color: var(--muted); text-align: center; padding: 26px 0; }
+  .hidden { display: none !important; }
+  code { background: var(--card); padding: 1px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏆 <span>Leaderboard</span> admin</h1>
+  <p class="sub">Delete names or reset boards for Biscuit Bake-Off, Echoes and One More Run. Only Mr. O's Google account can make changes.</p>
+
+  <div class="panel">
+    <div class="row">
+      <span id="who">Not signed in.</span>
+      <span class="spacer"></span>
+      <button class="primary" id="signIn">Sign in with Google</button>
+      <button id="signOut" class="hidden">Sign out</button>
+    </div>
+    <p id="msg"></p>
+  </div>
+
+  <div class="panel">
+    <div class="row" id="games">
+      <span class="label">Game</span>
+      <button data-g="biscuit">Biscuit Bake-Off</button>
+      <button data-g="echoes">Echoes</button>
+      <button data-g="onemorerun">One More Run</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <span class="label">Board</span>
+      <select id="boardSel"></select>
+      <button id="refresh">Refresh</button>
+      <span class="spacer"></span>
+      <button class="danger" id="resetBoard">Reset this board</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th>#</th><th>Name</th><th>Score</th><th>Posted</th><th></th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" class="empty">Pick a game.</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <span class="muted" style="color:var(--muted)">Old daily boards pile up over time (they're tiny). This clears every daily board except today's for the selected game.</span>
+      <span class="spacer"></span>
+      <button class="danger" id="clearOld">Clear old daily boards</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyDCotiRpQacvkoA3bUQxgJDz2Jr7u4zAa8',
+  authDomain: 'goop-group.firebaseapp.com',
+  databaseURL: 'https://goop-group-default-rtdb.firebaseio.com',
+  projectId: 'goop-group',
+  storageBucket: 'goop-group.firebasestorage.app',
+  messagingSenderId: '1031025453548',
+  appId: '1:1031025453548:web:f2cbe587a32aaf8e01f8c9',
+};
+const V = '10.12.2';
+const GAMES = { biscuit: 'Biscuit Bake-Off', echoes: 'Echoes', onemorerun: 'One More Run' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let game = 'biscuit', board = '', user = null, fa, fd, auth, db;
+
+function msg(text, kind = '') { $('msg').textContent = text; $('msg').className = kind; }
+function todayKey() { const d = new Date(); return 'd' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); }
+function boardLabel(k) { if (k === 'all') return 'All-time'; const s = k.slice(1); const label = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`; return (k === todayKey() ? "Today's challenge · " : 'Daily · ') + label; }
+function explain(e) {
+  const t = String(e && (e.code || e.message) || e);
+  if (/permission/i.test(t)) return user ? "Firebase said permission denied: this Google account isn't the admin in the database rules." : 'Sign in first.';
+  if (/unauthorized-domain/.test(t)) return 'Google sign-in is blocked on this website: add ostromaj.github.io under Firebase → Authentication → Settings → Authorized domains.';
+  if (/operation-not-allowed/.test(t)) return 'Google sign-in is turned off: enable it under Firebase → Authentication → Sign-in method → Google.';
+  if (/popup-closed|cancelled-popup/.test(t)) return 'Sign-in window closed.';
+  return 'Something went wrong: ' + t;
+}
+
+async function boot() {
+  try {
+    const [appM, authM, dbM] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`),
+    ]);
+    const app = appM.initializeApp(FIREBASE_CONFIG, 'lb-admin');
+    fa = authM; fd = dbM; auth = authM.getAuth(app); db = dbM.getDatabase(app);
+    fa.onAuthStateChanged(auth, u => {
+      user = u;
+      $('who').textContent = u ? `Signed in as ${u.email}` : 'Not signed in.';
+      $('signIn').classList.toggle('hidden', !!u);
+      $('signOut').classList.toggle('hidden', !u);
+      loadBoards();
+    });
+  } catch (e) { console.error(e); msg("Couldn't load Firebase. Check your connection.", 'err'); }
+}
+
+$('signIn').onclick = async () => {
+  msg('');
+  try { await fa.signInWithPopup(auth, new fa.GoogleAuthProvider()); }
+  catch (e) { console.error(e); msg(explain(e), 'err'); }
+};
+$('signOut').onclick = () => fa.signOut(auth);
+$('games').onclick = e => { const b = e.target.closest('button[data-g]'); if (!b) return; game = b.dataset.g; board = ''; loadBoards(); };
+$('boardSel').onchange = e => { board = e.target.value; loadRows(); };
+$('refresh').onclick = () => loadBoards();
+
+const r = p => fd.ref(db, `leaderboards/${game}${p ? '/' + p : ''}`);
+
+async function loadBoards() {
+  document.querySelectorAll('#games button').forEach(b => b.classList.toggle('on', b.dataset.g === game));
+  if (!db) return;
+  let keys = [];
+  if (user) {
+    try { const snap = await fd.get(fd.query(r(''), fd.orderByKey())); snap.forEach(c => { keys.push(c.key); }); }
+    catch (e) { msg(explain(e), 'err'); }
+  }
+  for (const k of ['all', todayKey()]) if (!keys.includes(k)) keys.push(k);
+  keys = keys.filter(k => /^(all|d\d{8})$/.test(k)).sort((a, b) => a === 'all' ? -1 : b === 'all' ? 1 : b.localeCompare(a));
+  if (!keys.includes(board)) board = keys.includes(todayKey()) ? todayKey() : 'all';
+  $('boardSel').innerHTML = keys.map(k => `<option value="${k}" ${k === board ? 'selected' : ''}>${boardLabel(k)}</option>`).join('');
+  loadRows();
+}
+
+async function loadRows() {
+  const tb = $('rows');
+  tb.innerHTML = '<tr><td colspan="5" class="empty">Loading…</td></tr>';
+  try {
+    const snap = await fd.get(r(board));
+    const rows = [];
+    snap.forEach(c => { const v = c.val() || {}; rows.push({ id: c.key, n: v.n, s: v.s, t: v.t || 0 }); });
+    rows.sort((a, b) => b.s - a.s || a.t - b.t);
+    $('resetBoard').disabled = !rows.length || !user;
+    tb.innerHTML = rows.length ? rows.map((x, i) => `<tr>
+        <td>${i + 1}</td><td>${esc(x.n)}</td><td class="num">${esc(x.s)}</td>
+        <td class="when">${x.t ? new Date(x.t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''}</td>
+        <td style="text-align:right"><button class="danger" data-del="${esc(x.id)}" data-name="${esc(x.n)}" ${user ? '' : 'disabled'}>Delete</button></td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">No scores on ${esc(boardLabel(board))} for ${esc(GAMES[game])}.</td></tr>`;
+  } catch (e) { tb.innerHTML = `<tr><td colspan="5" class="empty">${esc(explain(e))}</td></tr>`; }
+}
+
+$('rows').onclick = async e => {
+  const b = e.target.closest('button[data-del]');
+  if (!b) return;
+  if (!confirm(`Delete "${b.dataset.name}" from the ${GAMES[game]} ${boardLabel(board)} board?`)) return;
+  try { await fd.remove(r(`${board}/${b.dataset.del}`)); msg(`Deleted ${b.dataset.name}.`, 'ok'); loadRows(); }
+  catch (err) { msg(explain(err), 'err'); }
+};
+
+$('resetBoard').onclick = async () => {
+  const label = `${GAMES[game]} · ${boardLabel(board)}`;
+  if (prompt(`This wipes EVERY score on:\n${label}\n\nType RESET to confirm.`) !== 'RESET') return;
+  try { await fd.remove(r(board)); msg(`Reset ${label}.`, 'ok'); loadRows(); }
+  catch (err) { msg(explain(err), 'err'); }
+};
+
+$('clearOld').onclick = async () => {
+  if (!user) return msg('Sign in first.', 'err');
+  const today = todayKey();
+  const old = [...$('boardSel').options].map(o => o.value).filter(k => k !== 'all' && k !== today);
+  if (!old.length) return msg('No old daily boards for this game.', 'ok');
+  if (!confirm(`Clear ${old.length} old daily board${old.length === 1 ? '' : 's'} for ${GAMES[game]}? Today's and all-time stay.`)) return;
+  try { const up = {}; old.forEach(k => { up[k] = null; }); await fd.update(r(''), up); msg(`Cleared ${old.length} old daily board${old.length === 1 ? '' : 's'}.`, 'ok'); loadBoards(); }
+  catch (err) { msg(explain(err), 'err'); }
+};
+
+boot();
+</script>
+</body>
+</html>
