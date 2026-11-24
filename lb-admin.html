@@ -39,7 +39,7 @@
 <body>
 <div class="wrap">
   <h1>🏆 <span>Leaderboard</span> admin</h1>
-  <p class="sub">Delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run and PLUCK. Only Mr. O's Google account can make changes.</p>
+  <p class="sub">Delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run, PLUCK and DEEPGLOW. Only Mr. O's Google account can make changes.</p>
 
   <div class="panel">
     <div class="row">
@@ -58,6 +58,7 @@
       <button data-g="echoes">Echoes</button>
       <button data-g="onemorerun">One More Run</button>
       <button data-g="pluck">PLUCK</button>
+      <button data-g="deepglow">DEEPGLOW</button>
     </div>
     <div class="row" style="margin-top:12px">
       <span class="label">Board</span>
@@ -95,7 +96,9 @@ const FIREBASE_CONFIG = {
   appId: '1:1031025453548:web:f2cbe587a32aaf8e01f8c9',
 };
 const V = '10.12.2';
-const GAMES = { biscuit: 'Biscuit Bake-Off', echoes: 'Echoes', onemorerun: 'One More Run', pluck: 'PLUCK' };
+const GAMES = { biscuit: 'Biscuit Bake-Off', echoes: 'Echoes', onemorerun: 'One More Run', pluck: 'PLUCK', deepglow: 'DEEPGLOW' };
+// DEEPGLOW stores 100000 minus finish seconds (higher = faster); show it as a time.
+const showScore = (game, s) => { if (game !== 'deepglow') return s; const t = Math.max(0, 100000 - Number(s)); return Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0'); };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let game = 'biscuit', board = '', user = null, fa, fd, auth, db;
@@ -168,7 +171,7 @@ async function loadRows() {
     rows.sort((a, b) => b.s - a.s || a.t - b.t);
     $('resetBoard').disabled = !rows.length || !user;
     tb.innerHTML = rows.length ? rows.map((x, i) => `<tr>
-        <td>${i + 1}</td><td>${esc(x.n)}</td><td class="num">${esc(x.s)}</td>
+        <td>${i + 1}</td><td>${esc(x.n)}</td><td class="num">${esc(showScore(game, x.s))}</td>
         <td class="when">${x.t ? new Date(x.t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''}</td>
         <td style="text-align:right"><button class="danger" data-del="${esc(x.id)}" data-name="${esc(x.n)}" ${user ? '' : 'disabled'}>Delete</button></td></tr>`).join('')
       : `<tr><td colspan="5" class="empty">No scores on ${esc(boardLabel(board))} for ${esc(GAMES[game])}.</td></tr>`;
