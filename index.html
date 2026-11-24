@@ -167,6 +167,32 @@
     .marquee { padding: 14px 16px; }
     .grid { grid-template-columns: 1fr; }
   }
+
+  /* ---- play counter: an arcade coin meter. Every run started in any game drops a coin in the slot. ---- */
+  .meter { display: none; margin: 22px auto 4px; width: max-content; max-width: 100%; align-items: center; gap: 14px;
+    padding: 12px 16px; border-radius: 14px; background: #0b0a14; border: 2px solid var(--line);
+    box-shadow: inset 0 0 0 4px #15132a, 0 10px 30px rgba(0,0,0,.35); }
+  .meter.on { display: flex; animation: meterIn .6s ease-out; }
+  @keyframes meterIn { from { opacity: 0; transform: translateY(8px); } }
+  .slot { position: relative; width: 34px; height: 46px; flex: none; border-radius: 8px; background: #221e3b; border: 2px solid var(--line); overflow: hidden; }
+  .slot::before { content: ""; position: absolute; left: 50%; top: 10px; width: 4px; height: 24px; margin-left: -2px; border-radius: 2px; background: #050409; box-shadow: 0 0 0 2px #3a3460; }
+  .slot i { position: absolute; left: 50%; top: -22px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff1b8, var(--fun) 45%, #b8861d); box-shadow: 0 0 10px rgba(244,200,74,.6); opacity: 0; }
+  .slot i.drop { animation: coinDrop .9s cubic-bezier(.5,0,.8,.4) forwards; }
+  @keyframes coinDrop { 0% { opacity: 1; transform: translateY(0) rotateY(0); } 55% { opacity: 1; transform: translateY(32px) rotateY(80deg) scaleX(.25); } 100% { opacity: 0; transform: translateY(40px) rotateY(90deg) scaleX(.05); } }
+  .led { position: relative; font-family: "Press Start 2P", monospace; font-size: clamp(18px, 4.6vw, 26px); letter-spacing: 3px; line-height: 1; }
+  .led .ghost { color: rgba(244,200,74,.09); }
+  .led .lit { position: absolute; inset: 0; color: var(--fun); text-shadow: 0 0 8px rgba(244,200,74,.55), 0 0 22px rgba(244,200,74,.25); }
+  .led .lit b { color: rgba(244,200,74,.16); text-shadow: none; font-weight: inherit; }
+  .meter .cap { font-family: "Press Start 2P", monospace; font-size: 8px; letter-spacing: 2px; color: var(--muted); margin-top: 9px; text-align: left; line-height: 1.6; }
+  .meter .cap span { color: var(--live); }
+  .plays { display: none; font-family: "Press Start 2P", monospace; font-size: 8px; letter-spacing: 1px; color: var(--muted); margin: -2px 0 10px; align-items: center; gap: 6px; }
+  .plays.on { display: flex; }
+  .plays::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff1b8, var(--fun) 50%, #b8861d); flex: none; }
+  .plays b { color: var(--fun); font-weight: inherit; }
+  .plays.bump b { animation: playsBump .5s ease-out; }
+  @keyframes playsBump { 40% { color: #fff1b8; text-shadow: 0 0 8px rgba(244,200,74,.8); } }
+  @media (prefers-reduced-motion: reduce) { .slot i.drop, .plays.bump b, .meter.on { animation: none; } }
 </style>
 </head>
 <body>
@@ -175,6 +201,14 @@
   <header>
     <div class="marquee">MR. <span class="o">O</span>'S<br>ARCADE</div>
     <p class="tagline">Review games for IB Computer Science, IB Math Applications &amp; Interpretation, and functional math. Pick a game, grab your team, and try not to lose to the villain.</p>
+
+    <div class="meter" id="meter" role="img" aria-label="Games played">
+      <div class="slot" aria-hidden="true"><i></i></div>
+      <div>
+        <div class="led" aria-hidden="true"><span class="ghost">8888888</span><span class="lit" id="meterN"></span></div>
+        <div class="cap">GAMES PLAYED <span>&#9679;</span> LIVE</div>
+      </div>
+    </div>
 
     <nav class="filters" aria-label="Filter games">
       <button type="button" data-filter="all" aria-pressed="true">All games</button>
@@ -576,6 +610,7 @@
             <h3>Biscuit Bake-Off</h3>
             <p>Six stations, one shot at the perfect buttermilk biscuit. Try today's class challenge so everyone gets the same kitchen and can compare scores.</p>
             <div class="tags"><span>Solo</span><span>Daily class challenge</span></div>
+            <div class="plays" data-game="biscuit"><b>0</b> PLAYS</div>
             <div class="play">PLAY ▸</div>
           </div>
         </a>
@@ -594,6 +629,7 @@
             <h3>Echoes</h3>
             <p>Every gem you grab spawns a ghost that replays your exact moves. Don't touch your past. How many versions of yourself can you survive?</p>
             <div class="tags"><span>Solo</span><span>Phone or computer</span><span>Daily challenge</span></div>
+            <div class="plays" data-game="echoes"><b>0</b> PLAYS</div>
             <div class="play">PLAY ▸</div>
           </div>
         </a>
@@ -612,6 +648,7 @@
             <h3>One More Run</h3>
             <p>Tap to fling yourself to the next ring before its fuse burns out. Nail the center for perfect streaks. Miss once and it's over... so, one more run?</p>
             <div class="tags"><span>Solo</span><span>Phone or computer</span><span>Daily challenge</span></div>
+            <div class="plays" data-game="onemorerun"><b>0</b> PLAYS</div>
             <div class="play">PLAY ▸</div>
           </div>
         </a>
@@ -630,6 +667,7 @@
             <h3>PLUCK</h3>
             <p>One tap plucks the bouncing guitar pick, and every note it hits sets off more. Pluck on the beat for double points and chain the whole board into a song.</p>
             <div class="tags"><span>Solo</span><span>Phone or computer</span><span>Daily challenge</span><span>Sound on</span></div>
+            <div class="plays" data-game="pluck"><b>0</b> PLAYS</div>
             <div class="play">PLAY ▸</div>
           </div>
         </a>
@@ -713,6 +751,47 @@
     var start = (location.hash || '').replace('#', '');
     if (start === 'cs' || start === 'math' || start === 'func' || start === 'fun') apply(start);   // old #live links just show everything
   })();
+</script>
+<script type="module">
+  // Live play counts from the shared arcade database: /plays/<game>/n
+  const CFG = {
+    apiKey: 'AIzaSyDCotiRpQacvkoA3bUQxgJDz2Jr7u4zAa8',
+    authDomain: 'goop-group.firebaseapp.com',
+    databaseURL: 'https://goop-group-default-rtdb.firebaseio.com',
+    projectId: 'goop-group',
+    appId: '1:1031025453548:web:f2cbe587a32aaf8e01f8c9',
+  };
+  const V = '10.12.2';
+  try {
+    const [appMod, dbMod] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`),
+    ]);
+    const db = dbMod.getDatabase(appMod.initializeApp(CFG, 'arcade-plays'));
+    const meter = document.getElementById('meter'), out = document.getElementById('meterN');
+    const coin = meter.querySelector('.slot i');
+    const last = {}; let lastTotal = -1;
+    dbMod.onValue(dbMod.ref(db, 'plays'), snap => {
+      const all = snap.val() || {};
+      let total = 0;
+      for (const g in all) { const n = all[g] && all[g].n; if (typeof n === 'number') total += n; }
+      document.querySelectorAll('.plays').forEach(el => {
+        const n = (all[el.dataset.game] || {}).n || 0;
+        if (n < 1) return;
+        el.querySelector('b').textContent = n.toLocaleString('en-US');
+        el.classList.add('on');
+        if (last[el.dataset.game] != null && n > last[el.dataset.game]) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+        last[el.dataset.game] = n;
+      });
+      if (total < 1) return;
+      const digits = String(Math.min(total, 9999999)), pad = 7 - digits.length;
+      out.innerHTML = '<b>' + '0'.repeat(pad) + '</b>' + digits;
+      meter.setAttribute('aria-label', total.toLocaleString('en-US') + ' games played');
+      meter.classList.add('on');
+      if (lastTotal >= 0 && total > lastTotal) { coin.classList.remove('drop'); void coin.offsetWidth; coin.classList.add('drop'); }
+      lastTotal = total;
+    }, () => {});
+  } catch (e) { /* no counter if Firebase can't load; the arcade still works */ }
 </script>
 </body>
 </html>

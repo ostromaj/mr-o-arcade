@@ -34,12 +34,21 @@
   .empty { color: var(--muted); text-align: center; padding: 26px 0; }
   .hidden { display: none !important; }
   code { background: var(--card); padding: 1px 6px; border-radius: 6px; }
+  .plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+  .pg { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 12px; }
+  .pg .g { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .pg .t { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); line-height: 1.15; margin-top: 4px; }
+  .pg .d { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .pg .d b { color: var(--good); }
+  .pg.all { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
+  .spark { display: flex; align-items: flex-end; gap: 2px; height: 26px; margin-top: 8px; }
+  .spark i { flex: 1; background: color-mix(in srgb, var(--accent) 60%, transparent); border-radius: 2px 2px 0 0; min-height: 2px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>🏆 <span>Leaderboard</span> admin</h1>
-  <p class="sub">Delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run, PLUCK and DEEPGLOW. Only Mr. O's Google account can make changes.</p>
+  <p class="sub">See how many games have been played, and delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run, PLUCK and DEEPGLOW. Only Mr. O's Google account can make changes.</p>
 
   <div class="panel">
     <div class="row">
@@ -49,6 +58,11 @@
       <button id="signOut" class="hidden">Sign out</button>
     </div>
     <p id="msg"></p>
+  </div>
+
+  <div class="panel">
+    <div class="row"><strong>🎮 Games played</strong><span class="spacer"></span><span style="color:var(--muted);font-size:13px">Live · bars = last 14 days</span></div>
+    <div class="plays-grid" id="plays"><div class="pg"><div class="g">Loading…</div></div></div>
   </div>
 
   <div class="panel">
@@ -204,6 +218,32 @@ $('clearOld').onclick = async () => {
 };
 
 boot();
+
+// ---------- play counts (anyone can read these; only +1 writes are allowed) ----------
+function dayKeys(n) { const out = []; const d = new Date(); for (let i = n - 1; i >= 0; i--) { const x = new Date(d); x.setDate(d.getDate() - i); out.push(x.getFullYear() + String(x.getMonth() + 1).padStart(2, '0') + String(x.getDate()).padStart(2, '0')); } return out; }
+function renderPlays(all) {
+  const days = dayKeys(14), today = days[days.length - 1];
+  const fmt = n => (n || 0).toLocaleString('en-US');
+  let tot = 0, totToday = 0; const sum = days.map(() => 0);
+  const cards = Object.keys(GAMES).map(g => {
+    const p = all[g] || {}, d = p.d || {};
+    tot += p.n || 0; totToday += d[today] || 0;
+    const vals = days.map((k, i) => { sum[i] += d[k] || 0; return d[k] || 0; });
+    return card(GAMES[g], p.n, d[today], vals, '');
+  });
+  function card(name, n, t, vals, cls) {
+    const max = Math.max(1, ...vals);
+    return `<div class="pg ${cls}"><div class="g">${esc(name)}</div><div class="t">${fmt(n)}</div><div class="d"><b>${fmt(t)}</b> today</div>` +
+      `<div class="spark" title="Last 14 days">${vals.map((v, i) => `<i style="height:${Math.round(v / max * 100)}%" title="${days[i].slice(4, 6)}/${days[i].slice(6)}: ${v}"></i>`).join('')}</div></div>`;
+  }
+  $('plays').innerHTML = card('All games', tot, totToday, sum, 'all') + cards.join('');
+}
+async function watchPlays() {
+  while (!fd) await new Promise(r => setTimeout(r, 100));
+  fd.onValue(fd.ref(db, 'plays'), s => renderPlays(s.val() || {}),
+    e => { $('plays').innerHTML = `<div class="pg"><div class="g">${/permission/i.test(String(e)) ? 'Play counts are off: add the "plays" rules in Firebase.' : "Couldn't load play counts."}</div></div>`; });
+}
+watchPlays();
 </script>
 </body>
 </html>
