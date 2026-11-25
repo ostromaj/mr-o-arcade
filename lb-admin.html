@@ -48,7 +48,7 @@
 <body>
 <div class="wrap">
   <h1>🏆 <span>Leaderboard</span> admin</h1>
-  <p class="sub">See how many games have been played, and delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run, PLUCK and DEEPGLOW. Only Mr. O's Google account can make changes.</p>
+  <p class="sub">See how many games have been played, and delete names or reset boards for Biscuit Bake-Off, Echoes, One More Run, PLUCK, DEEPGLOW and Wobble Waiter. Only Mr. O's Google account can make changes.</p>
 
   <div class="panel">
     <div class="row">
@@ -73,6 +73,7 @@
       <button data-g="onemorerun">One More Run</button>
       <button data-g="pluck">PLUCK</button>
       <button data-g="deepglow">DEEPGLOW</button>
+      <button data-g="wobblewaiter">Wobble Waiter</button>
     </div>
     <div class="row" style="margin-top:12px">
       <span class="label">Board</span>
@@ -110,7 +111,7 @@ const FIREBASE_CONFIG = {
   appId: '1:1031025453548:web:f2cbe587a32aaf8e01f8c9',
 };
 const V = '10.12.2';
-const GAMES = { biscuit: 'Biscuit Bake-Off', echoes: 'Echoes', onemorerun: 'One More Run', pluck: 'PLUCK', deepglow: 'DEEPGLOW' };
+const GAMES = { biscuit: 'Biscuit Bake-Off', echoes: 'Echoes', onemorerun: 'One More Run', pluck: 'PLUCK', deepglow: 'DEEPGLOW', wobblewaiter: 'Wobble Waiter' };
 // DEEPGLOW stores 100000 minus finish seconds (higher = faster); show it as a time.
 const showScore = (game, s) => { if (game !== 'deepglow') return s; const t = Math.max(0, 100000 - Number(s)); return Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0'); };
 const $ = id => document.getElementById(id);
