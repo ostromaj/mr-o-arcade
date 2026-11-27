@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Kid Games · Mr. O's Arcade</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,800;1,9..144,500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0b14;
+    --card: #17141f;
+    --line: #2c2738;
+    --text: #f3efe8;
+    --muted: #a39cb0;
+    --horror: #e5484d;
+    --mindless: #f4c84a;
+    --story: #e8b466;
+    --strategy: #8fbf6a;
+    --chaos: #7ee05c;
+    --cozy: #f0a35e;
+    --adventure: #5cc8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Space Grotesk", system-ui, sans-serif; line-height: 1.5;
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(229,72,77,.10), transparent 40%),
+      radial-gradient(circle at 90% 20%, rgba(92,200,240,.08), transparent 40%);
+    background-attachment: fixed;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 60px; }
+
+  header { padding: 54px 0 20px; text-align: center; }
+  .kicker { letter-spacing: 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; }
+  h1 {
+    font-family: "Fraunces", Georgia, serif; font-weight: 800;
+    font-size: clamp(40px, 9vw, 84px); line-height: 1; margin: 10px 0 0;
+    letter-spacing: -1px;
+  }
+  h1 em { font-style: italic; font-weight: 500; color: var(--horror); }
+  .tagline { color: var(--muted); max-width: 520px; margin: 18px auto 0; font-size: 17px; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 30px 0 34px; }
+  .filters button {
+    font: inherit; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text); background: transparent; border: 1.5px solid var(--line);
+    border-radius: 999px; padding: 8px 16px; cursor: pointer;
+  }
+  .filters button:hover { border-color: var(--muted); }
+  .filters button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 22px; }
+
+  .card {
+    position: relative; display: flex; flex-direction: column;
+    background: var(--card); border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  a.card:hover, .card:focus-within { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 14px 40px -18px var(--accent); }
+  .card[hidden] { display: none; }
+  .art { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+  .art svg { display: block; width: 100%; height: 100%; transition: transform .6s ease; }
+  a.card:hover .art svg { transform: scale(1.04); }
+  .art::after { content: ""; position: absolute; inset: auto 0 0 0; height: 40%; background: linear-gradient(transparent, var(--card)); }
+
+  .genre {
+    position: absolute; top: 14px; left: 14px; z-index: 2;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 11px; border-radius: 999px; color: #0d0b14; background: var(--accent);
+  }
+  .genre + .genre { left: auto; right: 14px; background: rgba(13,11,20,.75); color: var(--text); border: 1px solid rgba(255,255,255,.18); }
+
+  .body { padding: 4px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+  .body h3 { font-family: "Fraunces", Georgia, serif; font-weight: 800; font-size: 30px; line-height: 1.05; margin: 0 0 8px; }
+  .body .line { font-style: italic; font-family: "Fraunces", Georgia, serif; color: var(--accent); margin: 0 0 10px; font-size: 16px; }
+  .body p.desc { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .tags span { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+  .play { font-weight: 700; letter-spacing: 2px; font-size: 13px; color: var(--accent); }
+  .plays { font-size: 12px; color: var(--muted); opacity: 0; transition: opacity .3s; }
+  .plays.on { opacity: 1; }
+  .plays b { color: var(--text); }
+
+  .links { display: flex; gap: 10px; margin-top: 16px; }
+  .links a {
+    flex: 1; text-align: center; font-weight: 700; letter-spacing: 1.5px; font-size: 13px;
+    border: 1.5px solid var(--accent); border-radius: 12px; padding: 10px 8px; color: var(--accent);
+  }
+  .links a:hover { background: var(--accent); color: #0d0b14; }
+  .links small { display: block; font-weight: 500; letter-spacing: 0; font-size: 11px; opacity: .8; }
+
+  .horror { --accent: var(--horror); }
+  .mindless { --accent: var(--mindless); }
+  .story { --accent: var(--story); }
+  .strategy { --accent: var(--strategy); }
+  .chaos { --accent: var(--chaos); }
+  .cozy { --accent: var(--cozy); }
+  .adventure { --accent: var(--adventure); }
+
+  footer { text-align: center; color: var(--muted); font-size: 14px; margin-top: 50px; }
+  footer a { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .art svg { transition: none; }
+    a.card:hover { transform: none; }
+    a.card:hover .art svg { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Mr. O's Arcade · after hours</div>
+    <h1>Big Kid <em>Games</em></h1>
+    <p class="tagline">The bigger, stranger, scarier ones. No vocab, no exam questions. Just games.</p>
+  </header>
+
+  <nav class="filters" aria-label="Filter by vibe">
+    <button data-f="all" aria-pressed="true">All</button>
+    <button data-f="horror" aria-pressed="false">Horror</button>
+    <button data-f="story" aria-pressed="false">Story</button>
+    <button data-f="strategy" aria-pressed="false">Strategy</button>
+    <button data-f="adventure" aria-pressed="false">Adventure</button>
+    <button data-f="mindless" aria-pressed="false">Mindless</button>
+    <button data-f="chaos" aria-pressed="false">Chaos</button>
+    <button data-f="cozy" aria-pressed="false">Cozy</button>
+  </nav>
+
+  <main class="grid">
+
+    <!-- ===== BOX ===== -->
+    <a class="card horror" data-g="horror" href="https://ostromaj.github.io/box-game/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Horror</span><span class="genre">3D</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="bxSky" cx="50%" cy="10%" r="70%"><stop offset="0" stop-color="#4a1418"/><stop offset="1" stop-color="#0a0608"/></radialGradient>
+            <radialGradient id="bxHole" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2d3550"/><stop offset="1" stop-color="#11131d"/></radialGradient>
+          </defs>
+          <rect width="400" height="250" fill="url(#bxSky)"/>
+          <ellipse cx="200" cy="38" rx="80" ry="22" fill="url(#bxHole)" stroke="#5a2a2e" stroke-width="3"/>
+          <path d="M160 30l18 10-10 12M232 26l-14 16 16 6M200 18v18" stroke="#8a9bc4" stroke-width="1.5" fill="none" opacity=".7"/>
+          <path d="M0 120h400M40 120v130M360 120v130" stroke="#2a1416" stroke-width="6"/>
+          <path d="M0 116h400" stroke="#3a1c1f" stroke-width="2"/>
+          <g fill="#1a0c0e"><rect x="0" y="200" width="400" height="50"/></g>
+          <path d="M70 250l20-90 20 90z" fill="#0f2a1a"/>
+          <g fill="#ffcf6b"><circle cx="84" cy="200" r="2.5"/><circle cx="96" cy="214" r="2.5"/><circle cx="80" cy="228" r="2.5"/><circle cx="100" cy="236" r="2.5"/><circle cx="90" cy="186" r="2.5"/></g>
+          <g fill="#050304">
+            <path d="M228 250c-6-40-4-82 4-108 6-20 20-30 34-30s28 10 34 30c8 26 10 68 4 108z"/>
+            <path d="M246 116c-8-18-24-30-40-34 12 10 22 22 28 38zM286 116c8-18 24-30 40-34-12 10-22 22-28 38z"/>
+            <path d="M232 150c-18 20-28 46-30 70l10 2c4-22 12-42 26-58zM300 150c18 20 28 46 30 70l-10 2c-4-22-12-42-26-58z"/>
+            <path d="M200 222l6 14 4-12 6 14 2-14zM332 222l-6 14-4-12-6 14-2-14z"/>
+          </g>
+          <circle cx="257" cy="134" r="3" fill="#ff3b3b"/><circle cx="275" cy="134" r="3" fill="#ff3b3b"/>
+          <g fill="none" stroke="#6b6f7a" stroke-width="2" opacity=".85">
+            <path d="M210 228c-10 6-16 14-14 22"/>
+            <circle cx="196" cy="236" r="3.5"/><circle cx="194" cy="244" r="3.5"/>
+          </g>
+          <circle cx="196" cy="248" r="5" fill="#c9a04a"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Box</h3>
+        <p class="line">You stayed after closing. Big mistake.</p>
+        <p class="desc">Something crashed through the skylight and took your little brother. Hide in the hampers, follow the crying, and listen for the bells. He can hear you.</p>
+        <div class="tags"><span>Solo</span><span>Phone or computer</span><span>Jumpscares</span><span>Sound on</span></div>
+        <div class="foot"><span class="play">ENTER IF YOU DARE ▸</span></div>
+      </div>
+    </a>
+
+    <!-- ===== LEAF THIEF ===== -->
+    <a class="card horror" data-g="horror" href="https://ostromaj.github.io/leaf-thief/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Horror</span><span class="genre">3D</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="ltSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1a24"/><stop offset="1" stop-color="#1f3a34"/></linearGradient>
+          </defs>
+          <rect width="400" height="250" fill="url(#ltSky)"/>
+          <circle cx="330" cy="46" r="22" fill="#d9e6d0" opacity=".85"/>
+          <rect y="196" width="400" height="54" fill="#141a1c"/>
+          <path d="M0 222h400" stroke="#c9b25a" stroke-width="3" stroke-dasharray="18 14"/>
+          <g fill="#08100e">
+            <path d="M70 200c4-40 2-70-6-96 10 12 16 26 18 44 4-26 2-50-6-74 16 24 22 52 20 84 6-20 6-44 0-66 14 26 16 60 8 108z"/>
+            <path d="M8 120c20-80 140-90 170-20 18 40-8 80-50 86-30 4-50-6-62-10-30 6-66-14-58-56z"/>
+            <path d="M72 140l-40-30M100 136l20-46M86 120l-6-50" stroke="#08100e" stroke-width="7" stroke-linecap="round"/>
+          </g>
+          <path d="M60 150q12-10 22 0" stroke="#ffd34d" stroke-width="3" fill="none"/>
+          <path d="M98 150q12-10 22 0" stroke="#ffd34d" stroke-width="3" fill="none"/>
+          <path d="M66 172c12 10 40 10 52 0l-6 4-6-4-6 5-6-5-6 5-6-5-6 4z" fill="#ffd34d"/>
+          <g transform="translate(290 140)">
+            <path d="M0 56V20L36 0l36 20v36z" fill="#0f1416"/>
+            <rect x="26" y="26" width="18" height="16" fill="#ffb84d"/>
+            <path d="M35 26v16M26 34h18" stroke="#0f1416" stroke-width="2"/>
+          </g>
+          <path d="M200 110c10-14 30-14 34 0-8 12-24 14-34 0z" fill="#e0a83a" transform="rotate(-20 217 110)"/>
+          <path d="M196 116l40-10" stroke="#8a5a1a" stroke-width="1.5" transform="rotate(-20 217 110)"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>The Leaf Thief</h3>
+        <p class="line">Take one leaf. Run.</p>
+        <p class="desc">Pick a leaf and the tree wakes up angry. Dodge traffic across the street, slam the windows, and make it into bed before the branches reach you. Every night it gets hungrier.</p>
+        <div class="tags"><span>Solo</span><span>First person</span><span>Phone or computer</span></div>
+        <div class="foot"><span class="play">STEAL A LEAF ▸</span></div>
+      </div>
+    </a>
+
+    <!-- ===== GENTLE GIANT ===== -->
+    <a class="card story" data-g="story" href="https://ostromaj.github.io/gentle-giant/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Story</span><span class="genre">God game</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="ggSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2a5a"/><stop offset=".6" stop-color="#d98a5a"/><stop offset="1" stop-color="#f3c47a"/></linearGradient>
+          </defs>
+          <rect width="400" height="250" fill="url(#ggSky)"/>
+          <g stroke="#ffe3a8" stroke-width="2" opacity=".35"><path d="M200 70L60 0M200 70L140 0M200 70L260 0M200 70L340 0"/></g>
+          <path d="M150 250c0-60 10-110 22-140 6-14 16-20 28-20s22 6 28 20c12 30 22 80 22 140z" fill="#3a2440" opacity=".92"/>
+          <circle cx="200" cy="72" r="22" fill="#3a2440" opacity=".92"/>
+          <path d="M172 120c-30 20-46 50-50 80M228 120c30 20 46 50 50 80" stroke="#3a2440" stroke-width="18" stroke-linecap="round" opacity=".92"/>
+          <circle cx="192" cy="70" r="2.5" fill="#ffe3a8"/><circle cx="208" cy="70" r="2.5" fill="#ffe3a8"/>
+          <rect y="214" width="400" height="36" fill="#5a3a3a"/>
+          <g fill="#2a1a22">
+            <path d="M20 214v-14l10-8 10 8v14zM50 214v-10l8-6 8 6v10zM300 214v-16l12-9 12 9v16zM334 214v-10l8-6 8 6v10zM362 214v-14l10-8 10 8v14z"/>
+          </g>
+          <g fill="#ffcf7a"><rect x="27" y="203" width="5" height="5"/><rect x="309" y="203" width="5" height="5"/><rect x="369" y="203" width="5" height="5"/></g>
+          <g font-family="Georgia, serif" font-size="16" fill="#fff1cf" opacity=".8">
+            <text x="60" y="120">◬</text><text x="96" y="90">⟟</text><text x="300" y="110">⌖</text><text x="330" y="80">◈</text><text x="270" y="150">⟁</text>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Gentle Giant</h3>
+        <p class="line">They pray to you. You can't understand a word.</p>
+        <p class="desc">You're a giant god over a tiny village. Crack their language, care for them, or smite the ones who talk trash. In the end you decide whether to stay or leave.</p>
+        <div class="tags"><span>Solo</span><span>Language puzzle</span><span>Branching endings</span><span>~45 min</span></div>
+        <div class="foot"><span class="play">BECOME THE GIANT ▸</span></div>
+      </div>
+    </a>
+
+    <!-- ===== HEIRLOOM ===== -->
+    <a class="card strategy" data-g="strategy" href="https://heirloom-55qx.onrender.com">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Strategy</span><span class="genre">2 players</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="hlSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e2d24"/><stop offset="1" stop-color="#4a5a3a"/></linearGradient>
+          </defs>
+          <rect width="400" height="250" fill="url(#hlSky)"/>
+          <path d="M0 180c60-30 120-30 200 0s140 30 200 0v70H0z" fill="#2c3a26"/>
+          <path d="M0 210c80-20 140-20 200 0s120 20 200 0v40H0z" fill="#1d2818"/>
+          <path d="M200 210V120" stroke="#3a2a1a" stroke-width="10"/>
+          <circle cx="200" cy="100" r="46" fill="#5d7a3e"/>
+          <circle cx="176" cy="88" r="24" fill="#6e8c48"/><circle cx="224" cy="92" r="22" fill="#4e6a34"/>
+          <circle cx="200" cy="100" r="11" fill="#e8c35a" stroke="#8a6a1a" stroke-width="3"/>
+          <g transform="translate(60 150)">
+            <path d="M0 40V14L22 0l22 14v26z" fill="#6b3a2a"/><rect x="16" y="22" width="12" height="18" fill="#2a1410"/>
+            <path d="M48 -6v46M48 -6h22l-6 8 6 8H48" fill="#c44a3a" stroke="#c44a3a" stroke-width="2"/>
+          </g>
+          <g transform="translate(296 150)">
+            <path d="M0 40V14L22 0l22 14v26z" fill="#2a3a5a"/><rect x="16" y="22" width="12" height="18" fill="#101624"/>
+            <path d="M-4 -6v46M-4 -6h-22l6 8-6 8h22" fill="#4a7ac4" stroke="#4a7ac4" stroke-width="2"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Heirloom</h3>
+        <p class="line">Two families. One valley. Take turns.</p>
+        <p class="desc">Grow your family's village turn by turn against a friend over a shared link. What you build gets passed down, so think a generation ahead.</p>
+        <div class="tags"><span>2 players</span><span>Turn-based</span><span>Shared link</span></div>
+        <div class="foot"><span class="play">START A FAMILY ▸</span></div>
+      </div>
+    </a>
+
+    <!-- ===== DEEPGLOW ===== -->
+    <a class="card adventure" data-g="adventure" href="https://ostromaj.github.io/DeepGlow/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Adventure</span><span class="genre">Upgrades</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="dgGlow" cx="50%" cy="55%" r="45%"><stop offset="0" stop-color="#ffb84d" stop-opacity=".55"/><stop offset="1" stop-color="#ffb84d" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect width="400" height="250" fill="#070c18"/>
+          <path d="M0 0h400v60c-40 20-60 0-100 16s-60-6-100 10-70-10-110 4S30 70 0 80z" fill="#101a30"/>
+          <path d="M0 250V190c40-10 70 6 110-4s70 10 110 0 80 8 110-2 50 6 70 0v66z" fill="#101a30"/>
+          <circle cx="200" cy="140" r="120" fill="url(#dgGlow)"/>
+          <g fill="#3fa8e0" opacity=".9">
+            <path d="M40 190l14-44 14 44z"/><path d="M60 190l8-26 8 26z" opacity=".7"/>
+            <path d="M330 194l12-52 12 52z"/><path d="M352 194l7-24 7 24z" opacity=".7"/>
+            <path d="M110 60l8 30 8-30z" opacity=".6"/><path d="M290 64l6 24 6-24z" opacity=".6"/>
+          </g>
+          <path d="M190 104h20M200 96v8" stroke="#3a2a1a" stroke-width="3"/>
+          <rect x="186" y="108" width="28" height="40" rx="5" fill="#ffd47a" stroke="#6a4a1a" stroke-width="3"/>
+          <path d="M200 120c-5 6-5 12 0 16 5-4 5-10 0-16z" fill="#ff7a2a"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>DEEPGLOW</h3>
+        <p class="line">Your oil is running out. Go deeper anyway.</p>
+        <p class="desc">Carry a lantern into the mountain and melt crystals before the dark wins. Grow your upgrade tree, beat the Geodes, and race to the Heart.</p>
+        <div class="tags"><span>Solo</span><span>Saves progress</span><span>~40 min</span></div>
+        <div class="foot"><span class="play">LIGHT THE LANTERN ▸</span><span class="plays" data-game="deepglow"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+    <!-- ===== ECHOES ===== -->
+    <a class="card mindless" data-g="mindless" href="https://ostromaj.github.io/Themostaddictinggame/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Mindless</span><span class="genre">Arcade</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="250" fill="#120e22"/>
+          <g fill="none" stroke="#2a2346" stroke-width="1"><path d="M0 50h400M0 100h400M0 150h400M0 200h400M80 0v250M160 0v250M240 0v250M320 0v250"/></g>
+          <path d="M50 200C90 120 140 210 190 140S280 60 330 90" fill="none" stroke="#8a7cf0" stroke-width="2" stroke-dasharray="4 8" opacity=".6"/>
+          <circle cx="70" cy="176" r="16" fill="#8a7cf0" opacity=".15"/>
+          <circle cx="120" cy="168" r="16" fill="#8a7cf0" opacity=".25"/>
+          <circle cx="170" cy="160" r="16" fill="#8a7cf0" opacity=".4"/>
+          <circle cx="220" cy="120" r="16" fill="#8a7cf0" opacity=".6"/>
+          <circle cx="270" cy="94" r="18" fill="#f4c84a"/>
+          <path d="M330 60l12 18-12 18-12-18z" fill="#5ce0e8"/>
+          <path d="M80 70l8 12-8 12-8-12z" fill="#5ce0e8" opacity=".5"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Echoes</h3>
+        <p class="line">Your worst enemy is you, five seconds ago.</p>
+        <p class="desc">Every gem you grab spawns a ghost that replays your exact moves. Don't touch your past. How many versions of yourself can you survive?</p>
+        <div class="tags"><span>Solo</span><span>Daily challenge</span><span>Leaderboard</span></div>
+        <div class="foot"><span class="play">PLAY ▸</span><span class="plays" data-game="echoes"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+    <!-- ===== ONE MORE RUN ===== -->
+    <a class="card mindless" data-g="mindless" href="https://ostromaj.github.io/one-more-run/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Mindless</span><span class="genre">One tap</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs><linearGradient id="omBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a0f12"/><stop offset="1" stop-color="#0f0a14"/></linearGradient></defs>
+          <rect width="400" height="250" fill="url(#omBg)"/>
+          <circle cx="80" cy="190" r="30" fill="none" stroke="#ff8a4a" stroke-width="5"/>
+          <circle cx="200" cy="110" r="30" fill="none" stroke="#ff8a4a" stroke-width="5" stroke-dasharray="120 80" opacity=".9"/>
+          <circle cx="320" cy="60" r="30" fill="none" stroke="#ff8a4a" stroke-width="5" stroke-dasharray="60 140" opacity=".6"/>
+          <path d="M100 168Q150 100 178 118" fill="none" stroke="#f4c84a" stroke-width="3" stroke-dasharray="3 7"/>
+          <circle cx="80" cy="190" r="9" fill="#f4c84a"/>
+          <circle cx="226" cy="82" r="4" fill="#ffe08a"/><circle cx="234" cy="76" r="2.5" fill="#ffb84d"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>One More Run</h3>
+        <p class="line">You will say "one more." You will lie.</p>
+        <p class="desc">Tap to fling yourself to the next ring before its fuse burns out. Nail the center for perfect streaks. Miss once and it's over.</p>
+        <div class="tags"><span>Solo</span><span>Daily challenge</span><span>Leaderboard</span></div>
+        <div class="foot"><span class="play">PLAY ▸</span><span class="plays" data-game="onemorerun"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+    <!-- ===== PLUCK ===== -->
+    <a class="card mindless" data-g="mindless" href="https://ostromaj.github.io/pluck/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Mindless</span><span class="genre">Music</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="250" fill="#0c0718"/>
+          <g fill="none" stroke="#e04ac4" stroke-width="2">
+            <circle cx="200" cy="125" r="40" opacity=".7"/><circle cx="200" cy="125" r="70" opacity=".45"/><circle cx="200" cy="125" r="104" opacity=".25"/><circle cx="200" cy="125" r="140" opacity=".12"/>
+          </g>
+          <path d="M200 160c-18-12-26-28-26-40 0-10 10-16 26-16s26 6 26 16c0 12-8 28-26 40z" fill="#f4c84a"/>
+          <g fill="#5ce0e8"><circle cx="70" cy="60" r="6"/><circle cx="330" cy="70" r="6"/><circle cx="90" cy="200" r="6"/><circle cx="320" cy="196" r="6"/></g>
+          <g fill="#e04ac4"><circle cx="130" cy="40" r="4"/><circle cx="280" cy="220" r="4"/><circle cx="360" cy="130" r="4"/><circle cx="40" cy="130" r="4"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>PLUCK</h3>
+        <p class="line">One tap. Then the whole board sings.</p>
+        <p class="desc">Pluck the bouncing guitar pick, and every note it hits sets off more. Hit it on the beat for double points and chain the whole board into a song.</p>
+        <div class="tags"><span>Solo</span><span>Daily board</span><span>Sound on</span></div>
+        <div class="foot"><span class="play">PLAY ▸</span><span class="plays" data-game="pluck"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+    <!-- ===== WOBBLE WAITER ===== -->
+    <a class="card mindless" data-g="mindless" href="https://ostromaj.github.io/wobble-waiter/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Mindless</span><span class="genre">Funny</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="250" fill="#2a1a12"/>
+          <g fill="#3a2418"><rect x="0" y="0" width="40" height="250"/><rect x="80" y="0" width="40" height="250"/><rect x="160" y="0" width="40" height="250"/><rect x="240" y="0" width="40" height="250"/><rect x="320" y="0" width="40" height="250"/></g>
+          <rect y="226" width="400" height="24" fill="#1a0f0a"/>
+          <g transform="rotate(-7 200 200)">
+            <path d="M200 205v40" stroke="#d8d0c0" stroke-width="6"/>
+            <rect x="140" y="196" width="120" height="9" rx="4" fill="#d8d0c0"/>
+            <ellipse cx="200" cy="188" rx="44" ry="8" fill="#e8a84a"/><ellipse cx="200" cy="180" rx="42" ry="8" fill="#f0b85a"/>
+            <circle cx="196" cy="156" r="18" fill="#1a1a1a"/><circle cx="190" cy="150" r="3" fill="#555"/><circle cx="200" cy="148" r="3" fill="#555"/>
+            <path d="M180 138c4-14 26-20 40-8l-4 6c4 2 6 6 4 10z" fill="#e8e0d0"/>
+            <path d="M216 128l8-8 2 10z" fill="#e04a3a"/><circle cx="212" cy="130" r="1.8" fill="#1a1a1a"/>
+            <path d="M190 116c0-12 6-20 14-20s14 8 14 20l-8-4-6 6-6-6z" fill="#f0e0b0"/>
+            <circle cx="200" cy="106" r="2" fill="#1a1a1a"/><circle cx="208" cy="106" r="2" fill="#1a1a1a"/>
+            <path d="M192 96l-6-10 10 6zM216 96l6-10-10 6z" fill="#f0e0b0"/>
+          </g>
+          <path d="M290 70c6 6 6 14 0 20M302 62c10 10 10 26 0 36" stroke="#f4c84a" stroke-width="3" fill="none" opacity=".7"/>
+          <path d="M60 236c8-10 22-10 30 0" stroke="#f4d84a" stroke-width="6" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Wobble Waiter</h3>
+        <p class="line">Table four ordered a live chicken.</p>
+        <p class="desc">The chef keeps throwing stuff on your tray: pancakes, a cat, a bowling ball. Slide to keep the tower up while dogs and banana peels try to wreck it.</p>
+        <div class="tags"><span>Solo</span><span>Daily challenge</span><span>Challenge a friend</span></div>
+        <div class="foot"><span class="play">PLAY ▸</span><span class="plays" data-game="wobblewaiter"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+    <!-- ===== GOOP GROUP ===== -->
+    <div class="card chaos" data-g="chaos">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Chaos</span><span class="genre">Live multiplayer</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="250" fill="#0a140c"/>
+          <circle cx="200" cy="125" r="150" fill="#122416" stroke="#2a4a2e" stroke-width="6"/>
+          <circle cx="200" cy="125" r="130" fill="none" stroke="#1d3a22" stroke-width="2"/>
+          <path d="M110 140c-14-26 6-56 34-54 22 2 34 18 34 36 0 22-18 34-36 34-12 0-20-4-32-16z" fill="#7ee05c"/>
+          <circle cx="134" cy="116" r="6" fill="#0a140c"/><circle cx="156" cy="112" r="6" fill="#0a140c"/>
+          <path d="M150 134c-8 6-18 4-24-2" stroke="#0a140c" stroke-width="3" fill="none"/>
+          <path d="M250 110c-6-14 6-28 20-26 12 2 18 12 16 22-2 14-14 20-24 18-6-2-10-6-12-14z" fill="#c44ae0"/>
+          <circle cx="262" cy="100" r="3.5" fill="#0a140c"/><circle cx="276" cy="98" r="3.5" fill="#0a140c"/>
+          <path d="M290 170c-4-8 4-16 12-14 6 2 8 8 6 12-2 6-10 8-14 6z" fill="#5ce0e8"/>
+          <g fill="#f4c84a"><circle cx="210" cy="60" r="4"/><circle cx="230" cy="190" r="4"/><circle cx="90" cy="70" r="3"/><circle cx="330" cy="80" r="3"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Goop Group</h3>
+        <p class="line">Eat or be eaten. Either way you get weirder.</p>
+        <p class="desc">Build a goop, drop into a giant petri dish with everyone, eat food and each other, and mutate as you grow. Getting eaten makes you weirder, not weaker.</p>
+        <div class="tags"><span>Live multiplayer</span><span>Chromebook or computer</span></div>
+        <div class="links">
+          <a href="https://ostromaj.github.io/goop-group/">JOIN ▸<small>Players</small></a>
+          <a href="https://ostromaj.github.io/goop-group/host.html">HOST ▸<small>Big screen</small></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BISCUIT BAKE-OFF ===== -->
+    <a class="card cozy" data-g="cozy" href="https://ostromaj.github.io/biscuitmaker/">
+      <div class="art" aria-hidden="true">
+        <span class="genre">Cozy</span><span class="genre">Cooking</span>
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <defs><radialGradient id="bbG" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#6a3a1a"/><stop offset="1" stop-color="#1e120c"/></radialGradient></defs>
+          <rect width="400" height="250" fill="url(#bbG)"/>
+          <ellipse cx="200" cy="200" rx="130" ry="22" fill="#3a3a40"/>
+          <ellipse cx="200" cy="196" rx="120" ry="18" fill="#55555c"/>
+          <path d="M140 190v-30c0-14 26-24 60-24s60 10 60 24v30c0 10-26 16-60 16s-60-6-60-16z" fill="#e8b45a"/>
+          <path d="M140 160c0 12 26 20 60 20s60-8 60-20" fill="none" stroke="#c48a3a" stroke-width="3"/>
+          <ellipse cx="200" cy="150" rx="56" ry="14" fill="#f5cf7a"/>
+          <ellipse cx="190" cy="148" rx="14" ry="5" fill="#fff0b0" opacity=".7"/>
+          <g fill="none" stroke="#f3e6d0" stroke-width="3" stroke-linecap="round" opacity=".55">
+            <path d="M176 120c-8-10 8-16 0-28s8-18 0-30"/><path d="M204 114c-8-10 8-16 0-28s8-18 0-30"/><path d="M230 120c-8-10 8-16 0-28"/>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h3>Biscuit Bake-Off</h3>
+        <p class="line">Six stations. One perfect biscuit.</p>
+        <p class="desc">Mix, fold, cut and bake your way to the perfect buttermilk biscuit. Everyone gets the same kitchen each day, so you can compare scores.</p>
+        <div class="tags"><span>Solo</span><span>Daily challenge</span></div>
+        <div class="foot"><span class="play">PREHEAT ▸</span><span class="plays" data-game="biscuit"><b>0</b> plays</span></div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>Made by Mr. Ostroman · <a href="../">Back to the arcade</a></footer>
+</div>
+
+<script>
+  (function () {
+    var btns = document.querySelectorAll('.filters button');
+    var cards = document.querySelectorAll('.card[data-g]');
+    function apply(f) {
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.f === f)); });
+      cards.forEach(function (c) { c.hidden = !(f === 'all' || c.dataset.g === f); });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { apply(b.dataset.f); }); });
+  })();
+</script>
+<script type="module">
+  // Live play counts from the shared arcade database: /plays/<game>/n
+  const CFG = {
+    apiKey: 'AIzaSyDCotiRpQacvkoA3bUQxgJDz2Jr7u4zAa8',
+    authDomain: 'goop-group.firebaseapp.com',
+    databaseURL: 'https://goop-group-default-rtdb.firebaseio.com',
+    projectId: 'goop-group',
+    appId: '1:1031025453548:web:f2cbe587a32aaf8e01f8c9',
+  };
+  const V = '10.12.2';
+  try {
+    const [appMod, dbMod] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`),
+    ]);
+    const db = dbMod.getDatabase(appMod.initializeApp(CFG, 'bigkid-plays'));
+    dbMod.onValue(dbMod.ref(db, 'plays'), snap => {
+      const all = snap.val() || {};
+      document.querySelectorAll('.plays').forEach(el => {
+        const n = (all[el.dataset.game] || {}).n || 0;
+        if (n < 1) return;
+        el.querySelector('b').textContent = n.toLocaleString('en-US');
+        el.classList.add('on');
+      });
+    }, () => {});
+  } catch (e) { /* counts are optional */ }
+</script>
+</body>
+</html>
